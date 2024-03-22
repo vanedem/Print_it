@@ -18,27 +18,10 @@ const slides = [
 ]
 
 document.addEventListener("DOMContentLoaded", function() {
-    // Sélectionner les flèches gauche et droite
     const arrowLeft = document.querySelector('.arrow_left');
     const arrowRight = document.querySelector('.arrow_right');
-    
-    // Ajouter un écouteur d'événements "click" à la flèche gauche
-    arrowLeft.addEventListener('click', function() {
-        // Afficher un message dans la console pour le clic sur la flèche gauche
-        console.log("Clic sur la flèche gauche !");
-    });
-    
-    // Ajouter un écouteur d'événements "click" à la flèche droite
-    arrowRight.addEventListener('click', function() {
-        // Afficher un message dans la console pour le clic sur la flèche droite
-        console.log("Clic sur la flèche droite !");
-    });
-});
-
-document.addEventListener("DOMContentLoaded", function() {
-    const arrowRight = document.querySelector('.arrow_right');
-    const arrowLeft = document.querySelector('.arrow_left');
     const bullets = document.querySelectorAll('.dots .dot');
+
     const slidesData = [
         {
             imagePath: "./assets/images/slideshow/slide1.jpg",
@@ -56,53 +39,58 @@ document.addEventListener("DOMContentLoaded", function() {
             imagePath: "./assets/images/slideshow/slide4.png",
             text: "Autocollants <span>avec découpe laser sur mesure</span>"
         }
-        // Ajoutez d'autres données pour les slides suivants ici
     ];
 
-    let currentSlideIndex = 0;
+    // Dupliquer les premières et dernières diapositives
+    const firstSlide = slidesData[0];
+    const lastSlide = slidesData[slidesData.length - 1];
+    slidesData.unshift(lastSlide);
+    slidesData.push(firstSlide);
 
-    // Ajouter un écouteur d'événements "click" à la flèche droite
+    let currentSlideIndex = 1; // Commencez par la deuxième diapositive (la première diapositive dupliquée)
+
+    // Mettre à jour le carrousel lors du clic sur la flèche droite
     arrowRight.addEventListener('click', function() {
-        // Passer au slide suivant
-        currentSlideIndex = (currentSlideIndex + 1) % slidesData.length;
-
-        // Mettre à jour le bullet point actif, l'image et le texte correspondant
-        updateSlide();
+        currentSlideIndex++;
+        updateCarousel();
     });
 
-    // Ajouter un écouteur d'événements "click" à la flèche gauche
+    // Mettre à jour le carrousel lors du clic sur la flèche gauche
     arrowLeft.addEventListener('click', function() {
-        // Passer au slide précédent
-        currentSlideIndex = (currentSlideIndex - 1 + slidesData.length) % slidesData.length;
-
-        // Mettre à jour le bullet point actif, l'image et le texte correspondant
-        updateSlide();
+        currentSlideIndex--;
+        updateCarousel();
     });
 
-    // Fonction pour mettre à jour le bullet point actif, l'image et le texte correspondant
-    function updateSlide() {
+    // Fonction pour mettre à jour le carrousel
+    function updateCarousel() {
+        // Si l'indice actuel est au début du carrousel (diapositive dupliquée), passez à la dernière diapositive réelle
+        if (currentSlideIndex === 0) {
+            currentSlideIndex = slidesData.length - 2;
+        }
+        // Si l'indice actuel est à la fin du carrousel (diapositive dupliquée), passez à la première diapositive réelle
+        else if (currentSlideIndex === slidesData.length - 1) {
+            currentSlideIndex = 1;
+        }
+
+        // Mettre à jour le contenu du carrousel
         const slide = slidesData[currentSlideIndex];
         const imageElement = document.querySelector('.banner-img');
         const textElement = document.querySelector('p');
-
-        // Mettre à jour l'image
         imageElement.src = slide.imagePath;
-
-        // Mettre à jour le texte
         textElement.innerHTML = slide.text;
 
-        // Mettre à jour le bullet point actif
+        // Mettre à jour le point sélectionné
         updateActiveBullet();
     }
 
-    // Fonction pour mettre à jour le bullet point actif
+    // Mettre à jour le point sélectionné
     function updateActiveBullet() {
-        // Retirer la classe 'dot_selected' de tous les bullets
         bullets.forEach(bullet => {
             bullet.classList.remove('dot_selected');
         });
-
-        // Ajouter la classe 'dot_selected' au bullet correspondant au slide actif
-        bullets[currentSlideIndex].classList.add('dot_selected');
+        bullets[currentSlideIndex - 1].classList.add('dot_selected'); // Soustrayez 1 car l'indice commence à 0
     }
+
+    // Démarrez le carrousel
+    updateCarousel();
 });
